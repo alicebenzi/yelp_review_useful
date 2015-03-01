@@ -46,7 +46,6 @@ data_rev_train["text_length"] = data_rev_train["text"].str.len()
 data_rev_train = data_rev_train.fillna(0)
 
 for i in range(data_rev_train.shape[0]):
-#for i in range(22740,22741):
     print i
     if data_rev_train["text"][i] == 0:
           adj.append(0)
@@ -93,14 +92,14 @@ print data_rev_test.head()
 ZIP = []
 for i in range(data_bs_train.shape[0]):
     ZIP.append(data_bs_train["full_address"][i][-5:])
-data_bs_train["ZIP"] = pd.DataFrame(ZIP)
-print data_bs_train.head()
+data_bs_train["zip_code"] = pd.DataFrame(ZIP)
+# print data_bs_train.head()
 
 ZIP_test = []
 for i in range(data_bs_test.shape[0]):
     ZIP_test.append(data_bs_test["full_address"][i][-5:])
-data_bs_test["ZIP"] = pd.DataFrame(ZIP_test)
-print data_bs_train.head()
+data_bs_test["zip_code"] = pd.DataFrame(ZIP_test)
+# print data_bs_train.head()
 
 
 #data_merge1 =  pd.merge(data_rev_train,data_bs_train, on ='business_id')
