@@ -84,7 +84,7 @@ for i in range(data_rev_test.shape[0]):
         tokens = nltk.tokenize.word_tokenize(data_rev_test["text"][i])
         text =nltk.Text(tokens)
         sentences = nltk.tokenize.sent_tokenize(data_rev_train["text"][i])
-        count_sent.append(len(sentences))
+        count_sent_test.append(len(sentences))
         tags = nltk.tag.pos_tag(text)
         text_feat = Counter([k if k not in string.punctuation else "PUNCT" for k in [j for i, j in tags]])
         adj.append(text_feat['JJ'])
