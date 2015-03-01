@@ -105,8 +105,14 @@ print data_bs_train.head()
 
 #data_merge1 =  pd.merge(data_rev_train,data_bs_train, on ='business_id')
 #data_merge2 = pd.merge(data_merge1,data_ck,on='business_id')
-#data_final = pd.merge(data_merge2,data_user_train,on = 'user_id')
+#data_train = pd.merge(data_merge2,data_user_train,on = 'user_id')
+#data_train.to_csv("train_new.csv")
 
+
+#data_mergea =  pd.merge(data_rev_test,data_bs_test, on ='business_id')
+#data_mergeb = pd.merge(data_mergea,data_ck_test_new,on='business_id')
+#data_test= pd.merge(data_mergeb,data_user_test,on = 'user_id')
+#data_test.to_csv("test_new.csv")
 
 
 
