@@ -8,12 +8,12 @@ import string
 
 data_bs_train = pd.read_table("yelp_training_set_business.csv", sep=",")
 data_ck_train = pd.read_table("yelp_training_set_checkin.csv", sep=",")
-data_rev_train = pd.read_table("yelp_training_set_review.csv", sep=",")
+data_rev_train = pd.read_table("yelp_training_set_review.csv", sep=",")[0:5]
 data_user_train = pd.read_table("yelp_training_set_user.csv", sep=",")
 
 data_bs_test = pd.read_table("yelp_test_set_business.csv", sep=",")
 data_ck_test = pd.read_table("yelp_test_set_checkin.csv", sep=",")
-data_rev_test = pd.read_table("yelp_test_set_review.csv", sep=",")
+data_rev_test = pd.read_table("yelp_test_set_review.csv", sep=",")[0:5]
 data_user_test = pd.read_table("yelp_test_set_user.csv", sep=",")
 
 # adding columns row wise for data_checkin
@@ -42,17 +42,21 @@ data_rev_test["freshness"] = data_rev_test["freshness"]/ np.timedelta64(1, 'D')
 # features from review text
 adj = []
 punct = []
+count_sent = []
 data_rev_train["text_length"] = data_rev_train["text"].str.len()
 data_rev_train = data_rev_train.fillna(0)
 
 for i in range(data_rev_train.shape[0]):
-    print i
+    #print i
     if data_rev_train["text"][i] == 0:
           adj.append(0)
           punct.append(0)
     else:
+
         tokens = nltk.tokenize.word_tokenize(data_rev_train["text"][i])
         text =nltk.Text(tokens)
+        sentences = nltk.tokenize.sent_tokenize(data_rev_train["text"][i])
+        count_sent.append(len(sentences))
         tags = nltk.tag.pos_tag(text)
         text_feat = Counter([k if k not in string.punctuation else "PUNCT" for k in [j for i, j in tags]])
         adj.append(text_feat['JJ'])
@@ -61,23 +65,26 @@ for i in range(data_rev_train.shape[0]):
 
 data_rev_train["count_adj"] = pd.DataFrame(adj)
 data_rev_train["count_punct"] = pd.DataFrame(punct)
-print data_rev_train.head()
+data_rev_train["count_sentences"] = pd.DataFrame(count_sent)
+#print data_rev_train.head()
 
 
 adj_test = []
 punct_test = []
+count_sent_test = []
 data_rev_test["text_length"] = data_rev_test["text"].str.len()
 data_rev_test = data_rev_test.fillna(0)
 
 for i in range(data_rev_test.shape[0]):
-#for i in range(22740,22741):
-    print i
+    #print i
     if data_rev_test["text"][i] == 0:
           adj_test.append(0)
           punct_test.append(0)
     else:
         tokens = nltk.tokenize.word_tokenize(data_rev_test["text"][i])
         text =nltk.Text(tokens)
+        sentences = nltk.tokenize.sent_tokenize(data_rev_train["text"][i])
+        count_sent.append(len(sentences))
         tags = nltk.tag.pos_tag(text)
         text_feat = Counter([k if k not in string.punctuation else "PUNCT" for k in [j for i, j in tags]])
         adj.append(text_feat['JJ'])
@@ -86,7 +93,12 @@ for i in range(data_rev_test.shape[0]):
 
 data_rev_test["count_adj"] = pd.DataFrame(adj)
 data_rev_test["count_punct"] = pd.DataFrame(punct)
-print data_rev_test.head()
+data_rev_test["count_sentences"] = pd.DataFrame(count_sent_test)
+
+#print data_rev_test.head()
+
+data_rev_train.to_csv("yelp_rev_train_feat.csv", index=False)
+data_rev_test.to_csv("yelp_rev_tst_feat.csv", index=False)
 
 # create new feature ZIP
 ZIP = []
