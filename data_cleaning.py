@@ -8,12 +8,12 @@ import string
 
 data_bs_train = pd.read_table("yelp_training_set_business.csv", sep=",")
 data_ck_train = pd.read_table("yelp_training_set_checkin.csv", sep=",")
-data_rev_train = pd.read_table("yelp_training_set_review.csv", sep=",")[0:5]
+data_rev_train = pd.read_table("yelp_training_set_review.csv", sep=",")
 data_user_train = pd.read_table("yelp_training_set_user.csv", sep=",")
 
 data_bs_test = pd.read_table("yelp_test_set_business.csv", sep=",")
 data_ck_test = pd.read_table("yelp_test_set_checkin.csv", sep=",")
-data_rev_test = pd.read_table("yelp_test_set_review.csv", sep=",")[0:5]
+data_rev_test = pd.read_table("yelp_test_set_review.csv", sep=",")
 data_user_test = pd.read_table("yelp_test_set_user.csv", sep=",")
 
 # adding columns row wise for data_checkin
