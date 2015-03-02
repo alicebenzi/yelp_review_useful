@@ -114,6 +114,43 @@ data_bs_test["zip_code"] = pd.DataFrame(ZIP_test)
 # print data_bs_train.head()
 
 
+# categories cleaning on train data
+
+all_categories_yelp = pd.read_table('yelp-business-categories-list/Sheet2-Table 1.csv',sep=",",header=None)
+all_categories_yelp = all_categories_yelp[2]
+l1 = list(all_categories_yelp)
+l1_set = set(l1)
+
+all_categories = data_bs_train['categories']
+all_categories[pd.isnull(all_categories)] = 'Other'
+data_bs_train['categories'] = all_categories
+
+
+for i in range(0,len(data_bs_train)):
+    a = data_bs_train['categories'][i]
+    a_s = a.split(',')
+    a_set = set(a_s)
+    if not l1_set.intersection(a_set):
+        #count += 1
+        a_set = 'Other'
+
+
+## categories cleaning on test data
+all_categories = data_bs_test['categories']
+all_categories[pd.isnull(all_categories)] = 'Other'
+data_bs_test['categories'] = all_categories
+
+for i in range(0,len(data_bs_test)):
+    a = data_bs_test['categories'][i]
+    a_s = a.split(',')
+    a_set = set(a_s)
+    if not l1_set.intersection(a_set):
+        #count += 1
+        a_set = 'Other'
+
+
+
+
 #data_merge1 =  pd.merge(data_rev_train,data_bs_train, on ='business_id')
 #data_merge2 = pd.merge(data_merge1,data_ck,on='business_id')
 #data_train = pd.merge(data_merge2,data_user_train,on = 'user_id')
