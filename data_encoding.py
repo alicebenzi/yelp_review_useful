@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 import numpy as np
 from sklearn import preprocessing
+from sklearn.svm import SVR
 
 
 def label_encoder(data, binary_cols, categorical_cols):
@@ -35,5 +36,60 @@ def normalize(X):
 
 if __name__ == "__main__":
 
-    train = pd.read_csv('train_new.csv',header=0)
-    test = pd.read_csv('test_new.csv',header=0)
+    train = pd.read_csv('train_new.csv', header=0)
+    pred = pd.read_csv('test_new.csv', header=0)
+
+    # print train.columns.values
+
+    del train["business_id"], train["date"], train["review_id"], train["text"], train["type_x"], train["user_id"],\
+        train["votes_cool_x"], train["votes_funny_x"],train["full_address"], train["latitude"], train["longitude"],\
+        train["name_x"], train["neighborhoods"], train["type_y"], train["name_y"], train["type"], train["votes_cool_y"],\
+        train["votes_funny_y"], train["votes_useful_y"]
+
+    #print test.columns.values
+    del pred["business_id"], pred["date"], pred["review_id"], pred["text"], pred["type_x"], pred["user_id"],\
+        pred["full_address"], pred["latitude"], pred["longitude"],\
+        pred["name_x"], pred["neighborhoods"], pred["type_y"], pred["name_y"], pred["type"]
+
+    col_names_train= train.columns.values
+    col_names_pred = pred.columns.values
+
+    target = np.array(train["votes_useful_x"])
+    target_var = ["votes_useful_x"]
+    binary_var = ["open"]
+    categorical_var = ["categories","city", "state", "zip_code"]
+    numerical_var = [col for col in col_names_train if col not in binary_var if col not in categorical_var if col not in target]
+    numerical_var_pred = [col for col in col_names_pred if col not in binary_var if col not in categorical_var]
+    encoded_categorical, encoded_binary = label_encoder(train, binary_var, categorical_var)
+    encoded_categorical_pred, encoded_binary_pred= label_encoder(pred, binary_var, categorical_var)
+
+    numerical_data = np.array(train[numerical_var])
+    numerical_data_pred = np.array(pred[numerical_var_pred])
+
+
+    training_data_transformed = np.concatenate((encoded_categorical,encoded_binary,numerical_data),axis=1)
+    pred_data_transformed = np.concatenate((encoded_categorical_pred,encoded_binary_pred,numerical_data_pred),axis=1)
+
+
+    #train-test split
+    train_x = training_data_transformed[0:160378,]
+    train_y = target[0:160378]
+    test_x = training_data_transformed[160379:200473,]
+    test_y = target[160379:200473]
+    pred_x = pred_data_transformed
+
+
+
+    #normalizing (if required)
+    train_x = normalize(train_x)
+    test_x = normalize(test_x)
+
+
+
+
+    #quicktest
+    # clf = SVR(C=1.0, epsilon=0.2)
+    # clf.fit(train_x,train_y)
+    # print clf.score(test_x, test_y)
+
+
