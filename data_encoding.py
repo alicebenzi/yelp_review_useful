@@ -34,7 +34,7 @@ def normalize(X):
 
 
 
-if __name__ == "__main__":
+def train_test():
 
     train = pd.read_csv('train_new.csv', header=0)
     pred = pd.read_csv('test_new.csv', header=0)
@@ -53,6 +53,8 @@ if __name__ == "__main__":
 
     col_names_train= train.columns.values
     col_names_pred = pred.columns.values
+
+    #print col_names_train
 
     target = np.array(train["votes_useful_x"])
     target_var = ["votes_useful_x"]
@@ -81,8 +83,10 @@ if __name__ == "__main__":
 
 
     #normalizing (if required)
-    train_x = normalize(train_x)
-    test_x = normalize(test_x)
+    train_x_norm = normalize(train_x)
+    test_x_norm = normalize(test_x)
+
+    return train_x, train_y,test_x, test_y, train_x_norm, test_x_norm
 
 
 
