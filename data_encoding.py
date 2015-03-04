@@ -60,7 +60,7 @@ def train_test():
     target_var = ["votes_useful_x"]
     binary_var = ["open"]
     categorical_var = ["categories","city", "state", "zip_code"]
-    numerical_var = [col for col in col_names_train if col not in binary_var if col not in categorical_var if col not in target]
+    numerical_var = [col for col in col_names_train if col not in binary_var if col not in categorical_var if col not in target_var]
     numerical_var_pred = [col for col in col_names_pred if col not in binary_var if col not in categorical_var]
     encoded_categorical, encoded_binary = label_encoder(train, binary_var, categorical_var)
     encoded_categorical_pred, encoded_binary_pred= label_encoder(pred, binary_var, categorical_var)
@@ -86,7 +86,7 @@ def train_test():
     train_x_norm = normalize(train_x)
     test_x_norm = normalize(test_x)
 
-    return train_x, train_y,test_x, test_y, train_x_norm, test_x_norm
+    return train_x, train_y,test_x, test_y, train_x_norm, test_x_norm, pred_x
 
 
 
