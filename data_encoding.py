@@ -87,7 +87,7 @@ def train_test():
     train, pred = category_manipulation(train, pred)
 
     # print train.columns.values
-    bus_id = pred['business_id']
+    review_id = pred['review_id']
     
 
     del train["business_id"], train["date"], train["review_id"], train["text"], train["type_x"], train["user_id"],\
@@ -174,7 +174,8 @@ def train_test():
     #pd.DataFrame(pred_x).to_csv("test_labelenc.csv")
 
     #REMEMBER TO ENCODE THE CATEGORICAL VARS
-    # train_x, test_x = dummy_encoder(train_x, pred_x, categorical_variable_list = list(range(0,1,1)))
+    # print train_x[1:5],
+    train_x, pred_x = dummy_encoder(train_x, pred_x, categorical_variable_list = list(range(0,1,1)))
     # print train_x[0:5,], test_x[0:5,]
 
     #normalizing (if required)
@@ -182,12 +183,12 @@ def train_test():
     #test_x_norm = normalize(test_x)
     pred_x_norm = normalize(pred_x)
 
-    print len(train_x[0]),len(pred_x[0])
+    # print len(train_x[0]),len(pred_x[0])
     #print
     # print train_x, train_y
     # return train_x, train_y,test_x, test_y, train_x_norm, test_x_norm, pred_x, pred_x_norm, bus_id
     # train_x, pred_x = dummy_encoder(train_x, pred_x,)
-    return train_x, train_y,train_x_norm, pred_x, pred_x_norm, bus_id
+    return train_x, train_y,train_x_norm, pred_x, pred_x_norm, review_id
 
 
 

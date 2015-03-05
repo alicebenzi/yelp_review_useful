@@ -33,13 +33,23 @@ def support_vector_regressor(X_train, y_train):
 
 if __name__ == '__main__':
 
-    train_x, train_y,train_x_norm, pred_x, pred_x_norm, bus_id = train_test()
+    train_x, train_y,train_x_norm, pred_x, pred_x_norm, review_id = train_test()
     print "data fetched..."
 
     rf = RandomForestRegressor()
     rf.fit(train_x, train_y)
-
-    pd.DataFrame(bus_id,rf.predict(pred_x)).to_csv("rf_predicted.csv")
+    print rf.score(train_x, train_y)
+    Votes = rf.predict(pred_x)
+    Id = np.array(review_id)
+    print len(Votes), len(Id)
+    df = pd.DataFrame(Votes,Id)
+    # list_data = [Id,Votes]
+    # submission_rf = pd.concat(list_data)
+    # submission_rf= np.concatenate((Id,Votes),axis=0)
+    # print submission_rf
+    # # np.savetxt("rf_predicted.csv", submission_rf, delimiter=',',fmt="%s")
+    # # pd.DataFrame(bus_id,rf.predict(pred_x)).to_csv("rf_predicted.csv")
+    df.to_csv("submission_rf.csv", engine="python")
     print "rf done"
 
     # print rf.score(train_x,train_y)
@@ -48,10 +58,14 @@ if __name__ == '__main__':
     #print train_x[1:5,], train_y[1:5], test_x[1:5,],test_y[1:5]
     # support_vector_regressor(train_x_norm,train_y)
 
-    gbr = GradientBoostingRegressor()
-    gbr.fit(train_x, train_y)
-    pd.DataFrame(bus_id,gbr.predict(pred_x)).to_csv("gbr_predicted.csv")
-    print "gbr done"
+    # gbr = GradientBoostingRegressor()
+    # gbr.fit(train_x, train_y)
+    # print gbr.score(train_x, train_y)
+    # Votes = pd.DataFrame(gbr.predict(pred_x))
+    # Id = bus_id
+    # print pd.concat(Id,Votes)
+    # pd.concat(Id,Votes).to_csv("gbr_predicted.csv")
+    # print "gbr done"
 
     # print "RMSE gbr:", rsmle_(gbr.predict(test_x),test_y)
 
