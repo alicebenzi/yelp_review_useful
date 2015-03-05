@@ -172,6 +172,7 @@ data_rev_train_1 = pd.read_csv("yelp_rev_train_feat.csv",sep=',')
 data_rev_test_1 = pd.read_csv("yelp_rev_tst_feat.csv", sep =',')
 
 
+
 data_merge1 =  pd.merge(data_rev_train_1,data_bs_train, on ='business_id')
 data_merge2 = pd.merge(data_merge1,data_ck,on='business_id')
 data_train = pd.merge(data_merge2,data_user_train,on = 'user_id')
