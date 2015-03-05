@@ -39,17 +39,18 @@ if __name__ == '__main__':
     rf = RandomForestRegressor()
     rf.fit(train_x, train_y)
     print rf.score(train_x, train_y)
-    Votes = rf.predict(pred_x)
-    Id = np.array(review_id)
+    Votes = rf.predict(pred_x)[:,np.newaxis]
+    Id = np.array(review_id)[:,np.newaxis]
     print len(Votes), len(Id)
-    df = pd.DataFrame(Votes,Id)
+
+    # df = pd.DataFrame(Votes,Id)
     # list_data = [Id,Votes]
     # submission_rf = pd.concat(list_data)
-    # submission_rf= np.concatenate((Id,Votes),axis=0)
+    submission_rf= np.concatenate((Id,Votes),axis=1)
     # print submission_rf
-    # # np.savetxt("rf_predicted.csv", submission_rf, delimiter=',',fmt="%s")
+    np.savetxt("submission_rf.csv", submission_rf,header="Id, Votes", delimiter=',',fmt=["%s","%0.2f"], comments='')
     # # pd.DataFrame(bus_id,rf.predict(pred_x)).to_csv("rf_predicted.csv")
-    df.to_csv("submission_rf.csv", engine="python")
+    # df.to_csv("submission_rf.csv", engine="python", label=["Id","Votes"], sep=',', header=True)
     print "rf done"
 
     # print rf.score(train_x,train_y)
