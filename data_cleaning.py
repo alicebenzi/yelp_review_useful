@@ -2,6 +2,7 @@ __author__ = 'alicebenziger'
 
 import pandas as pd
 import numpy as np
+from sklearn.cluster import MiniBatchKMeans
 import nltk
 from collections import Counter
 import string
@@ -151,6 +152,22 @@ data_bs_test['categories'] = all_categories
 #         #count += 1
 #         a_set = 'Other'
 
+
+
+
+# create user similarity clusters based on review count and average stars from review table.
+data_user_train_temp = data_user_train[["average_stars","review_count"]]
+data_user_test_temp = data_user_test[["average_stars","review_count"]]
+# apply kmeans to create clusters
+k = 125
+kmeans = MiniBatchKMeans(n_clusters=k, random_state=1377, init_size=k*10)
+kmeans.fit(data_user_train_temp)
+# create column of similar users in user table in training set.
+data_user_train['user_id_cluster_'+str(k)] = kmeans.predict(data_user_train_temp)
+# create column of similar users in user table in test set.
+data_user_test['user_id_cluster_'+str(k)] = kmeans.predict(data_user_test_temp)
+
+
 data_rev_train_1 = pd.read_csv("yelp_rev_train_feat.csv",sep=',')
 data_rev_test_1 = pd.read_csv("yelp_rev_tst_feat.csv", sep =',')
 
@@ -166,7 +183,6 @@ data_mergea =  pd.merge(data_rev_test_1,data_bs_test, on ='business_id')
 data_mergeb = pd.merge(data_mergea,data_ck_test_new,on='business_id')
 data_test= pd.merge(data_mergeb,data_user_test,on = 'user_id')
 data_test.to_csv("test_new.csv", index=False)
-
 
 
 
