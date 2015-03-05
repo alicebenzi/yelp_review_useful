@@ -134,7 +134,11 @@ def train_test():
     target = np.array(train["votes_useful_x"])
     target_var = ["votes_useful_x"]
     binary_var = ["open"]
+<<<<<<< HEAD
     categorical_var = ["cat_clust_100", "zip_clust"]#, "user_id_cluster_125"]
+=======
+    categorical_var = ["cat_clust_100", "zip_clust", "user_id_cluster_125"]
+>>>>>>> origin/temp
 
 
     col_names_train= train.columns.values
