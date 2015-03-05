@@ -64,17 +64,18 @@ def category_manipulation(train,test):
     ## CATEGORY CLUSTERS
     #  Based on the category extracted before, the idea is to create a n clusters to
     #  aggregate set of similar categories
-    for esti in (20,35,50,60,70,80,90,100,110,125):
-        km = KMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
-        #         init='k-means++', n_clusters=3, n_init=10
-        print "fitting "+str(esti)+" clusters - category"
-        init_time = time.time()
-        km.fit(cat_fea)
-        print (time.time()-init_time)/60
+    # for esti in (20,35,50,60,70,80,90,100,110,125):
+    km = MiniBatchKMeans(n_clusters=100, random_state=888)#, init_size=esti*10)
+    #         init='k-means++', n_clusters=3, n_init=10
+    # print "fitting "+str(esti)+" clusters - category"
+    # init_time = time.time()
+    km.fit(cat_fea)
+    # print (time.time()-init_time)/60
         
-        train['cat_clust_'+str(esti)] = km.predict(cat_fea)
-        test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
-    
+        # train['cat_clust_'+str(esti)] = km.predict(cat_fea)
+        # test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
+    train['cat_clust_100'] = km.predict(cat_fea)
+    test['cat_clust_100'] = km.predict(cat_fea_test)
     return train,test
 
 
@@ -92,12 +93,12 @@ def train_test():
     del train["business_id"], train["date"], train["review_id"], train["text"], train["type_x"], train["user_id"],\
         train["votes_cool_x"], train["votes_funny_x"],train["full_address"], train["latitude"], train["longitude"],\
         train["name_x"], train["neighborhoods"], train["type_y"], train["name_y"], train["type"], train["votes_cool_y"],\
-        train["votes_funny_y"], train["votes_useful_y"], train["state"], train["city"],train["category"]
+        train["votes_funny_y"], train["votes_useful_y"], train["state"], train["city"],train["categories"]
 
     #print test.columns.values
     del pred["business_id"], pred["date"], pred["review_id"], pred["text"], pred["type_x"], pred["user_id"],\
         pred["full_address"], pred["latitude"], pred["longitude"],\
-        pred["name_x"], pred["neighborhoods"], pred["type_y"], pred["name_y"], pred["type"], pred["state"], pred["city"],pred["category"]
+        pred["name_x"], pred["neighborhoods"], pred["type_y"], pred["name_y"], pred["type"], pred["state"], pred["city"],pred["categories"]
 
 
 
@@ -105,9 +106,9 @@ def train_test():
     ### Vectorizing  ZIP
     vect = CountVectorizer(tokenizer=lambda text: text.split(','))
     zip_fea = vect.fit_transform(train['zip_code'])
-    print zip_fea
+    # print zip_fea
     zip_fea = zip_fea.todense()
-    print zip_fea
+    # print zip_fea
     idx_max_1 = zip_fea > 1
     zip_fea[idx_max_1] = 1
     zip_fea_test = vect.transform(pred['zip_code'])
@@ -127,13 +128,13 @@ def train_test():
 
 
 
-    print train.head()
-    print pred.head()
+    # print train.head()
+    # print pred.head()
 
     target = np.array(train["votes_useful_x"])
     target_var = ["votes_useful_x"]
     binary_var = ["open"]
-    categorical_var = ["categories", "zip_clust"]
+    categorical_var = ["cat_clust_100", "zip_clust"]
 
 
     col_names_train= train.columns.values
@@ -173,18 +174,20 @@ def train_test():
     #pd.DataFrame(pred_x).to_csv("test_labelenc.csv")
 
     #REMEMBER TO ENCODE THE CATEGORICAL VARS
-    # train_x, test_x = dummy_encoder(train_x, pred_x, categorical_variable_list = list(range(0,2,1)))
+    # train_x, test_x = dummy_encoder(train_x, pred_x, categorical_variable_list = list(range(0,1,1)))
+    # print train_x[0:5,], test_x[0:5,]
 
     #normalizing (if required)
-    # train_x_norm = normalize(train_x)
+    train_x_norm = normalize(train_x)
     #test_x_norm = normalize(test_x)
-    # pred_x_norm = normalize(pred_x)
+    pred_x_norm = normalize(pred_x)
 
-
+    print len(train_x[0]),len(pred_x[0])
+    #print
     # print train_x, train_y
     # return train_x, train_y,test_x, test_y, train_x_norm, test_x_norm, pred_x, pred_x_norm, bus_id
     # train_x, pred_x = dummy_encoder(train_x, pred_x,)
-    # return train_x, train_y,train_x_norm, pred_x, pred_x_norm, bus_id
+    return train_x, train_y,train_x_norm, pred_x, pred_x_norm, bus_id
 
 
 
