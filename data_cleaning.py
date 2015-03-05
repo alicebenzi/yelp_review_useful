@@ -117,10 +117,10 @@ data_bs_test["zip_code"] = pd.DataFrame(ZIP_test)
 
 # categories cleaning on train data
 
-all_categories_yelp = pd.read_table('yelp-business-categories-list/Sheet2-Table 1.csv',sep=",",header=None)
-all_categories_yelp = all_categories_yelp[2]
-l1 = list(all_categories_yelp)
-l1_set = set(l1)
+# all_categories_yelp = pd.read_table('yelp-business-categories-list/Sheet2-Table 1.csv',sep=",",header=None)
+# all_categories_yelp = all_categories_yelp[2]
+# l1 = list(all_categories_yelp)
+# l1_set = set(l1)
 
 #print data_bs_train.head()
 all_categories = data_bs_train['categories']
@@ -143,13 +143,13 @@ all_categories = data_bs_test['categories']
 all_categories[pd.isnull(all_categories)] = 'Other'
 data_bs_test['categories'] = all_categories
 
-for i in range(0,len(data_bs_test)):
-    a = data_bs_test['categories'][i]
-    a_s = a.split(',')
-    a_set = set(a_s)
-    if not l1_set.intersection(a_set):
-        #count += 1
-        a_set = 'Other'
+# for i in range(0,len(data_bs_test)):
+#     a = data_bs_test['categories'][i]
+#     a_s = a.split(',')
+#     a_set = set(a_s)
+#     if not l1_set.intersection(a_set):
+#         #count += 1
+#         a_set = 'Other'
 
 data_rev_train_1 = pd.read_csv("yelp_rev_train_feat.csv",sep=',')
 data_rev_test_1 = pd.read_csv("yelp_rev_tst_feat.csv", sep =',')

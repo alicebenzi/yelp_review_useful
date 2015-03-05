@@ -5,6 +5,7 @@ from sklearn.svm import SVR
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 from sklearn.cross_validation import cross_val_score
 
@@ -32,14 +33,22 @@ def support_vector_regressor(X_train, y_train):
 
 if __name__ == '__main__':
 
-    train_x, train_y,test_x, test_y, train_x_norm, test_x_norm, pred_x = train_test()
+    train_x, train_y, train_x_norm, pred_x, pred_x_norm, bus_id = train_test()
 
 
     rf = RandomForestRegressor()
     rf.fit(train_x, train_y)
-    print rf.score(train_x,train_y)
-    print rf.score(test_x,test_y)
-    print rsmle_(rf.predict(test_x),test_y)
+    pd.DataFrame(bus_id,rf.predict(pred_x)).to_csv("rf_predicted.csv")
+
+    # print rf.score(train_x,train_y)
+    # print rf.score(test_x,test_y)
+    # print "RMSE rf:",rsmle_(rf.predict(pred_x))
     #print train_x[1:5,], train_y[1:5], test_x[1:5,],test_y[1:5]
     # support_vector_regressor(train_x_norm,train_y)
+
+    gbr = GradientBoostingRegressor()
+    gbr.fit(train_x, train_y)
+    pd.DataFrame(bus_id,gbr.predict(pred_x)).to_csv("gbr_predicted.csv")
+
+    # print "RMSE gbr:", rsmle_(gbr.predict(test_x),test_y)
 
