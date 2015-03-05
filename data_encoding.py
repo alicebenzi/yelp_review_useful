@@ -48,24 +48,56 @@ def normalize(X):
     return normalized_X
 
 
+def category_manipulation(train,test):
+    vect = CountVectorizer(tokenizer=lambda text: text.split(','))
+    
+    cat_fea = vect.fit_transform(train['categories'].fillna(''))
+    cat_fea = cat_fea.todense()
+    idx_max_1 = cat_fea > 1
+    cat_fea[idx_max_1] = 1
+    
+    cat_fea_test = vect.transform(test['categories'].fillna(''))
+    cat_fea_test = cat_fea_test.todense()
+    idx_max_1 = cat_fea_test > 1
+    cat_fea_test[idx_max_1] = 1
+    
+    ## CATEGORY CLUSTERS
+    #  Based on the category extracted before, the idea is to create a n clusters to
+    #  aggregate set of similar categories
+    for esti in (20,35,50,60,70,80,90,100,110,125):
+        km = KMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
+        #         init='k-means++', n_clusters=3, n_init=10
+        print "fitting "+str(esti)+" clusters - category"
+        init_time = time.time()
+        km.fit(cat_fea)
+        print (time.time()-init_time)/60
+        
+        train['cat_clust_'+str(esti)] = km.predict(cat_fea)
+        test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
+    
+    return train,test
+
 
 def train_test():
 
     train = pd.read_csv('train_new.csv', header=0)
     pred = pd.read_csv('test_new.csv', header=0)
+    
+    train, pred = category_manipulation(train, pred)
 
     # print train.columns.values
     bus_id = pred['business_id']
+    
 
     del train["business_id"], train["date"], train["review_id"], train["text"], train["type_x"], train["user_id"],\
         train["votes_cool_x"], train["votes_funny_x"],train["full_address"], train["latitude"], train["longitude"],\
         train["name_x"], train["neighborhoods"], train["type_y"], train["name_y"], train["type"], train["votes_cool_y"],\
-        train["votes_funny_y"], train["votes_useful_y"], train["state"], train["city"]
+        train["votes_funny_y"], train["votes_useful_y"], train["state"], train["city"],train["category"]
 
     #print test.columns.values
     del pred["business_id"], pred["date"], pred["review_id"], pred["text"], pred["type_x"], pred["user_id"],\
         pred["full_address"], pred["latitude"], pred["longitude"],\
-        pred["name_x"], pred["neighborhoods"], pred["type_y"], pred["name_y"], pred["type"], pred["state"], pred["city"]
+        pred["name_x"], pred["neighborhoods"], pred["type_y"], pred["name_y"], pred["type"], pred["state"], pred["city"],pred["category"]
 
 
 
