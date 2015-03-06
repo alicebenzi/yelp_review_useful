@@ -6,6 +6,80 @@ from sklearn.cluster import MiniBatchKMeans
 import nltk
 from collections import Counter
 import string
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.cluster import MiniBatchKMeans
+import time
+
+def category_manipulation(train,test):
+    vect = CountVectorizer(tokenizer=lambda text: text.split(','))
+
+    cat_fea = vect.fit_transform(train['categories'].fillna(''))
+    cat_fea = cat_fea.todense()
+    idx_max_1 = cat_fea > 1
+    cat_fea[idx_max_1] = 1
+
+    cat_fea_test = vect.transform(test['categories'].fillna(''))
+    cat_fea_test = cat_fea_test.todense()
+    idx_max_1 = cat_fea_test > 1
+    cat_fea_test[idx_max_1] = 1
+
+    # CATEGORY CLUSTERS
+    #  Based on the category extracted before, the idea is to create a n clusters to
+    #  aggregate set of similar categories
+    # for esti in (2,3):#,60,70,80,90,100,110,125):
+    #     km = MiniBatchKMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
+    # #       init='k-means++', n_clusters=3, n_init=10
+    #     print "fitting "+str(esti)+" clusters - category"
+    #     init_time = time.time()
+    #     km.fit(cat_fea)
+    #     print (time.time()-init_time)/60
+    #     train['cat_clust_'+str(esti)] = km.predict(cat_fea)
+    #
+    #     test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
+    esti = 2
+    km = MiniBatchKMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
+    #       init='k-means++', n_clusters=3, n_init=10
+    print "fitting "+str(esti)+" clusters - category"
+    init_time = time.time()
+    km.fit(cat_fea)
+    print (time.time()-init_time)/60
+    train['cat_clust_'+str(esti)] = km.predict(cat_fea)
+
+    test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
+
+
+    return train,test
+
+
+
+def lat_long_manipulation(train, test):
+    # for esti in (5,10,15,20,25,30,40):
+    #     km = MiniBatchKMeans(n_clusters=esti, random_state=1377, init_size=esti*100)
+    #
+    #     print "fitting "+str(esti)+" clusters - location"
+    #     init_time = time.time()
+    #     km.fit(train.ix[:,['latitude','longitude']])
+    #     print (time.time()-init_time)/60
+    #
+    #     train['loc_clust_'+str(esti)] = km.predict(train.ix[:,['latitude','longitude']])
+    #
+    #     test['loc_clust_'+str(esti)] = km.predict(test.ix[:,['latitude','longitude']])
+
+    esti = 5
+    km = MiniBatchKMeans(n_clusters=esti, random_state=1377, init_size=esti*100)
+
+    print "fitting "+str(esti)+" clusters - location"
+    init_time = time.time()
+    km.fit(train.ix[:,['latitude','longitude']])
+    print (time.time()-init_time)/60
+
+    train['loc_clust_'+str(esti)] = km.predict(train.ix[:,['latitude','longitude']])
+
+    test['loc_clust_'+str(esti)] = km.predict(test.ix[:,['latitude','longitude']])
+
+    return train, test
+
+
 
 data_bs_train = pd.read_table("yelp_training_set_business.csv", sep=",")
 data_ck_train = pd.read_table("yelp_training_set_checkin.csv", sep=",")
@@ -31,7 +105,7 @@ data_ck_test_new = data_ck_test[["business_id","total_checkins"]]
 
 
 # freshness of a review
-data_rev_train["freshness"] =pd.to_datetime('2013-01-19')- pd.to_datetime(data_rev_train["date"])
+data_rev_train["freshness"] = pd.to_datetime('2013-01-19')- pd.to_datetime(data_rev_train["date"])
 data_rev_train["freshness"] = data_rev_train["freshness"]/ np.timedelta64(1, 'D')
 # print data_rev_train.head()
 
@@ -153,6 +227,10 @@ data_bs_test['categories'] = all_categories
 #         a_set = 'Other'
 
 
+# clustering cat and lat-long
+
+data_bs_train, data_bs_test = category_manipulation(data_bs_train, data_bs_test)
+data_bs_train, data_bs_test = lat_long_manipulation(data_bs_train, data_bs_test)
 
 
 # create user similarity clusters based on review count and average stars from review table.
@@ -173,17 +251,26 @@ data_rev_test_1 = pd.read_csv("yelp_rev_tst_feat.csv", sep =',')
 
 
 
+<<<<<<< Updated upstream
 data_merge1 =  pd.merge(data_rev_train_1,data_bs_train, on ='business_id')
 data_merge2 = pd.merge(data_merge1,data_ck,on='business_id')
 data_train = pd.merge(data_merge2,data_user_train,on = 'user_id')
+=======
+## category manipulation on train and test bs data
+
+data_merge1 =  pd.merge(data_rev_train_1, data_bs_train, on ='business_id',how='outer')
+data_merge2 = pd.merge(data_merge1, data_ck,on='business_id',how='outer')
+data_train = pd.merge(data_merge2,data_user_train,on = 'user_id',how='outer')
+>>>>>>> Stashed changes
 data_train.to_csv("train_new.csv",index=False)
 
 
 
-data_mergea =  pd.merge(data_rev_test_1,data_bs_test, on ='business_id')
-data_mergeb = pd.merge(data_mergea,data_ck_test_new,on='business_id')
-data_test= pd.merge(data_mergeb,data_user_test,on = 'user_id')
+data_mergea =  pd.merge(data_rev_test_1,data_bs_test, on ='business_id',how='outer')
+data_mergeb = pd.merge(data_mergea,data_ck_test_new,on='business_id',how='outer')
+data_test= pd.merge(data_mergeb,data_user_test,on = 'user_id',how='outer')
 data_test.to_csv("test_new.csv", index=False)
 
+# print len(data_test)
 
 
