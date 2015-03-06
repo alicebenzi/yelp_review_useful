@@ -28,7 +28,7 @@ def label_encoder(data, binary_cols, categorical_cols):
 
 
 def dummy_encoder(train_X,test_X,categorical_variable_list):
-    enc = OneHotEncoder(n_values ='auto',categorical_features=categorical_variable_list)
+    enc = OneHotEncoder(n_values ='1000',categorical_features=categorical_variable_list)
     train_X = enc.fit_transform(train_X).toarray()
     test_X = enc.transform(test_X).toarray()
     return train_X, test_X
@@ -156,14 +156,14 @@ def train_test():
     target = np.array(train["votes_useful_x"])
     target_var = ["votes_useful_x"]
     binary_var = ["open"]
-<<<<<<< Updated upstream
+
 
     categorical_var = ["cat_clust_100", "zip_clust", "user_id_cluster_125"]
 
-=======
+
     # categorical_var = ["cat_clust_20", "zip_code", "user_id_cluster_125"]
     categorical_var = ["cat_clust_2","loc_clust_5","zip_code", "user_id_cluster_125"]
->>>>>>> Stashed changes
+
 
 
     col_names_train= train.columns.values
