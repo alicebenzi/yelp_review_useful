@@ -10,74 +10,33 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.cluster import MiniBatchKMeans
 import time
 
-def category_manipulation(train,test):
-    vect = CountVectorizer(tokenizer=lambda text: text.split(','))
 
-    cat_fea = vect.fit_transform(train['categories'].fillna(''))
-    cat_fea = cat_fea.todense()
-    idx_max_1 = cat_fea > 1
-    cat_fea[idx_max_1] = 1
-
-    cat_fea_test = vect.transform(test['categories'].fillna(''))
-    cat_fea_test = cat_fea_test.todense()
-    idx_max_1 = cat_fea_test > 1
-    cat_fea_test[idx_max_1] = 1
-
-    # CATEGORY CLUSTERS
-    #  Based on the category extracted before, the idea is to create a n clusters to
-    #  aggregate set of similar categories
-    # for esti in (2,3):#,60,70,80,90,100,110,125):
-    #     km = MiniBatchKMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
-    # #       init='k-means++', n_clusters=3, n_init=10
-    #     print "fitting "+str(esti)+" clusters - category"
-    #     init_time = time.time()
-    #     km.fit(cat_fea)
-    #     print (time.time()-init_time)/60
-    #     train['cat_clust_'+str(esti)] = km.predict(cat_fea)
-    #
-    #     test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
-    esti = 2
-    km = MiniBatchKMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
-    #       init='k-means++', n_clusters=3, n_init=10
-    print "fitting "+str(esti)+" clusters - category"
-    init_time = time.time()
-    km.fit(cat_fea)
-    print (time.time()-init_time)/60
-    train['cat_clust_'+str(esti)] = km.predict(cat_fea)
-
-    test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
-
-
-    return train,test
-
-
-
-def lat_long_manipulation(train, test):
-    # for esti in (5,10,15,20,25,30,40):
-    #     km = MiniBatchKMeans(n_clusters=esti, random_state=1377, init_size=esti*100)
-    #
-    #     print "fitting "+str(esti)+" clusters - location"
-    #     init_time = time.time()
-    #     km.fit(train.ix[:,['latitude','longitude']])
-    #     print (time.time()-init_time)/60
-    #
-    #     train['loc_clust_'+str(esti)] = km.predict(train.ix[:,['latitude','longitude']])
-    #
-    #     test['loc_clust_'+str(esti)] = km.predict(test.ix[:,['latitude','longitude']])
-
-    esti = 5
-    km = MiniBatchKMeans(n_clusters=esti, random_state=1377, init_size=esti*100)
-
-    print "fitting "+str(esti)+" clusters - location"
-    init_time = time.time()
-    km.fit(train.ix[:,['latitude','longitude']])
-    print (time.time()-init_time)/60
-
-    train['loc_clust_'+str(esti)] = km.predict(train.ix[:,['latitude','longitude']])
-
-    test['loc_clust_'+str(esti)] = km.predict(test.ix[:,['latitude','longitude']])
-
-    return train, test
+# def lat_long_manipulation(train, test):
+#     # for esti in (5,10,15,20,25,30,40):
+#     #     km = MiniBatchKMeans(n_clusters=esti, random_state=1377, init_size=esti*100)
+#     #
+#     #     print "fitting "+str(esti)+" clusters - location"
+#     #     init_time = time.time()
+#     #     km.fit(train.ix[:,['latitude','longitude']])
+#     #     print (time.time()-init_time)/60
+#     #
+#     #     train['loc_clust_'+str(esti)] = km.predict(train.ix[:,['latitude','longitude']])
+#     #
+#     #     test['loc_clust_'+str(esti)] = km.predict(test.ix[:,['latitude','longitude']])
+#
+#     esti = 5
+#     km = MiniBatchKMeans(n_clusters=esti, random_state=1377, init_size=esti*100)
+#
+#     print "fitting "+str(esti)+" clusters - location"
+#     init_time = time.time()
+#     km.fit(train.ix[:,['latitude','longitude']])
+#     print (time.time()-init_time)/60
+#
+#     train['loc_clust_'+str(esti)] = km.predict(train.ix[:,['latitude','longitude']])
+#
+#     test['loc_clust_'+str(esti)] = km.predict(test.ix[:,['latitude','longitude']])
+#
+#     return train, test
 
 
 
@@ -100,18 +59,16 @@ data_ck_train = data_ck_train.fillna(0)
 data_ck_test = data_ck_test.fillna(0)
 
 # new check in dataframe with just total check-in's
-data_ck = data_ck_train[["business_id","total_checkins"]]
-data_ck_test_new = data_ck_test[["business_id","total_checkins"]]
+data_ck_train = data_ck_train[["business_id","total_checkins"]]
+data_ck_test = data_ck_test[["business_id","total_checkins"]]
 
 
 # freshness of a review
 data_rev_train["freshness"] = pd.to_datetime('2013-01-19')- pd.to_datetime(data_rev_train["date"])
 data_rev_train["freshness"] = data_rev_train["freshness"]/ np.timedelta64(1, 'D')
-# print data_rev_train.head()
 
 data_rev_test["freshness"] = pd.to_datetime('2013-03-12')- pd.to_datetime(data_rev_train["date"])
 data_rev_test["freshness"] = data_rev_test["freshness"]/ np.timedelta64(1, 'D')
-# print data_rev_test.head()
 
 
 # features from review text
@@ -176,101 +133,106 @@ data_rev_test["freshness"] = data_rev_test["freshness"]/ np.timedelta64(1, 'D')
 # data_rev_test.to_csv("yelp_rev_tst_feat.csv", index=False)
 
 
-# create new feature ZIP
+
 ZIP = []
 for i in range(data_bs_train.shape[0]):
-    ZIP.append(data_bs_train["full_address"][i][-5:])
+    last_five_chars = data_bs_train["full_address"][i][-5:]
+    if last_five_chars.isdigit():
+        ZIP.append(last_five_chars)
+    else:
+        ZIP.append("12345")
 data_bs_train["zip_code"] = pd.DataFrame(ZIP)
 # print data_bs_train.head()
 
 ZIP_test = []
 for i in range(data_bs_test.shape[0]):
-    ZIP_test.append(data_bs_test["full_address"][i][-5:])
+    last_five_chars = data_bs_test["full_address"][i][-5:]
+    if last_five_chars.isdigit():
+        ZIP_test.append(last_five_chars)
+    else:
+        ZIP_test.append("12345")
+
 data_bs_test["zip_code"] = pd.DataFrame(ZIP_test)
 # print data_bs_train.head()
 
 
-# categories cleaning on train data
+# filling NA in categories with other
 
-# all_categories_yelp = pd.read_table('yelp-business-categories-list/Sheet2-Table 1.csv',sep=",",header=None)
-# all_categories_yelp = all_categories_yelp[2]
-# l1 = list(all_categories_yelp)
-# l1_set = set(l1)
-
-#print data_bs_train.head()
 all_categories = data_bs_train['categories']
 all_categories[pd.isnull(all_categories)] = 'Other'
 data_bs_train['categories'] = all_categories
-#print data_bs_train.head()
-#
-#
-# for i in range(0,len(data_bs_train)):
-#     a = data_bs_train['categories'][i]
-#     a_s = a.split(',')
-#     a_set = set(a_s)
-#     if not l1_set.intersection(a_set):
-#         #count += 1
-#         a_set = 'Other'
 
 
-## categories cleaning on test data
 all_categories = data_bs_test['categories']
 all_categories[pd.isnull(all_categories)] = 'Other'
 data_bs_test['categories'] = all_categories
-
-# for i in range(0,len(data_bs_test)):
-#     a = data_bs_test['categories'][i]
-#     a_s = a.split(',')
-#     a_set = set(a_s)
-#     if not l1_set.intersection(a_set):
-#         #count += 1
-#         a_set = 'Other'
-
-
-# clustering cat and lat-long
-
-data_bs_train, data_bs_test = category_manipulation(data_bs_train, data_bs_test)
-data_bs_train, data_bs_test = lat_long_manipulation(data_bs_train, data_bs_test)
-
-
-# create user similarity clusters based on review count and average stars from review table.
-data_user_train_temp = data_user_train[["average_stars","review_count"]]
-data_user_test_temp = data_user_test[["average_stars","review_count"]]
-# apply kmeans to create clusters
-k = 125
-kmeans = MiniBatchKMeans(n_clusters=k, random_state=1377, init_size=k*10)
-kmeans.fit(data_user_train_temp)
-# create column of similar users in user table in training set.
-data_user_train['user_id_cluster_'+str(k)] = kmeans.predict(data_user_train_temp)
-# create column of similar users in user table in test set.
-data_user_test['user_id_cluster_'+str(k)] = kmeans.predict(data_user_test_temp)
 
 
 data_rev_train_1 = pd.read_csv("yelp_rev_train_feat.csv",sep=',')
 data_rev_test_1 = pd.read_csv("yelp_rev_tst_feat.csv", sep =',')
 
+#getting training data
 
+data_merge1 = pd.merge(data_rev_train_1, data_bs_train, on ='business_id',how='left',suffixes=('_rev','_bs'))
+data_merge2 = pd.merge(data_merge1, data_ck_train,on='business_id',how='left')
+data_merge2['total_checkins'] = data_merge2['total_checkins'].fillna(0)
+data_train = pd.merge(data_merge2,data_user_train,on = 'user_id',how='left',suffixes=('_rev','_user'))
+data_train['average_stars'] = data_train['average_stars'].fillna(4)
+data_train['review_count_user'] = data_train['review_count_user'].fillna(6)
 
-<<<<<<< Updated upstream
-data_merge1 =  pd.merge(data_rev_train_1,data_bs_train, on ='business_id')
-data_merge2 = pd.merge(data_merge1,data_ck,on='business_id')
-data_train = pd.merge(data_merge2,data_user_train,on = 'user_id')
-=======
-## category manipulation on train and test bs data
-
-data_merge1 =  pd.merge(data_rev_train_1, data_bs_train, on ='business_id',how='outer')
-data_merge2 = pd.merge(data_merge1, data_ck,on='business_id',how='outer')
-data_train = pd.merge(data_merge2,data_user_train,on = 'user_id',how='outer')
->>>>>>> Stashed changes
-data_train.to_csv("train_new.csv",index=False)
+data_train = data_train
+data_train_copy = data_train.copy(deep=True)
 
 
 
-data_mergea =  pd.merge(data_rev_test_1,data_bs_test, on ='business_id',how='outer')
-data_mergeb = pd.merge(data_mergea,data_ck_test_new,on='business_id',how='outer')
-data_test= pd.merge(data_mergeb,data_user_test,on = 'user_id',how='outer')
-data_test.to_csv("test_new.csv", index=False)
+del data_train['business_id'],data_train['date'],data_train['text'],data_train['type_rev'],\
+    data_train['user_id'],data_train['votes_cool_rev'],data_train['votes_funny_rev'], \
+    data_train['city'],data_train['full_address'],data_train['name_rev'],data_train['neighborhoods'],\
+    data_train['state'],data_train['type_bs'],\
+    data_train['name_user'],data_train['type'],data_train['votes_cool_user'],\
+    data_train['votes_funny_user'],data_train['votes_useful_user'], data_train['latitude'], data_train['longitude']
 
-# print len(data_test)
+data_train.to_csv('train_new.csv')
+
+#getting test data
+
+del data_bs_test["neighborhoods"], data_bs_train["neighborhoods"]
+test_train_bs = data_bs_test.copy(deep=True)
+train_test_diff_bs = data_bs_train[~data_bs_train["business_id"].isin(data_bs_test["business_id"])].dropna()
+test_train_bs= test_train_bs.append(train_test_diff_bs)
+
+test_train_user = data_user_test.copy(deep=True)
+train_test_diff_usr = data_user_train[~data_user_train["user_id"].isin(data_user_test["user_id"])].dropna()
+test_train_user= test_train_user.append(train_test_diff_usr)
+
+#-----deleting useful,funny, cool votes from the test_train_user-----##
+
+del test_train_user["votes_cool"], test_train_user["votes_funny"], test_train_user["votes_useful"]
+
+
+##------merging test-----------##
+
+data_mergea =  pd.merge(data_rev_test_1, test_train_bs, on ='business_id',how='left',suffixes=('_rev','_bs'))
+# print data_mergea.head()
+data_mergeb = pd.merge(data_mergea, data_ck_train,on='business_id',how='left')
+data_mergeb['total_checkins'] = data_mergeb['total_checkins'].fillna(0)
+data_test = pd.merge(data_mergeb,test_train_user,on = 'user_id',how='left',suffixes=('_rev','_user'))
+# print data_test.head()
+data_test['average_stars'] = data_test['average_stars'].fillna(4)
+data_test['review_count_user'] = data_test['review_count_user'].fillna(10)
+
+# print data_test.head()
+data_test = data_test
+data_test_copy = data_test.copy(deep=True)
+
+del data_test['business_id'],data_test['date'],data_test['text'],data_test['type_rev'],\
+    data_test['user_id'], \
+    data_test['city'],data_test['full_address'],data_test['name_rev'],\
+    data_test['state'],data_test['type_bs'],\
+    data_test['name_user'],data_test['type'],data_test['latitude'], data_test['longitude']
+
+
+data_test.to_csv('test_new.csv')
+
 
 
