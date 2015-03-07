@@ -26,10 +26,11 @@ if __name__ == '__main__':
     print "data fetched..."
 
     rf = RandomForestRegressor()
-    rf.fit(train_x, train_y)
+    rf.fit(train_x, np.log(train_y+1))
 
-    print rf.score(train_x, train_y)
-    Votes = rf.predict(pred_x)[:,np.newaxis]
+    print rf.score(train_x, np.log(train_y+1))
+    rf_pred = np.exp(rf.predict(pred_x))-1.0
+    Votes = rf_pred[:,np.newaxis]
     Id = np.array(review_id)[:,np.newaxis]
     print len(Votes), len(Id)
 
