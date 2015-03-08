@@ -55,8 +55,8 @@ data_ck_train["total_checkins"] = data_ck_train.sum(axis=1)
 data_ck_test["total_checkins"] = data_ck_train.sum(axis=1)
 
 #replacing NA's with zeroes in check -in
-data_ck_train = data_ck_train.fillna(0)
-data_ck_test = data_ck_test.fillna(0)
+data_ck_train = data_ck_train.fillna(10)
+data_ck_test = data_ck_test.fillna(10)
 
 # new check in dataframe with just total check-in's
 data_ck_train = data_ck_train[["business_id","total_checkins"]]
@@ -192,7 +192,7 @@ del data_train['business_id'],data_train['date'],data_train['text'],data_train['
     data_train['name_user'],data_train['type'],data_train['votes_cool_user'],\
     data_train['votes_funny_user'],data_train['votes_useful_user'], data_train['latitude'], data_train['longitude']
 
-data_train.to_csv('train_new.csv')
+data_train.to_csv('train_new.csv',index=False)
 
 #getting test data
 
@@ -232,7 +232,7 @@ del data_test['business_id'],data_test['date'],data_test['text'],data_test['type
     data_test['name_user'],data_test['type'],data_test['latitude'], data_test['longitude']
 
 
-data_test.to_csv('test_new.csv')
+data_test.to_csv('test_new.csv',index=False)
 
 
 
