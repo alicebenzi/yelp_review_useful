@@ -27,8 +27,12 @@ def label_encoder(data, binary_cols):
 
 def dummy_encoder(train_X,test_X,categorical_variable_list):
     enc = OneHotEncoder(n_values ='auto',categorical_features=categorical_variable_list)
-    train_X = enc.fit_transform(train_X).toarray()
-    test_X = enc.transform(test_X).toarray()
+    train_X = enc.fit_transform(train_X)
+    test_X = enc.transform(test_X)
+
+    #
+    # train_X = enc.fit_transform(train_X).toarray()
+    # test_X = enc.transform(test_X).toarray()
     return train_X, test_X
 
 
@@ -56,15 +60,15 @@ def category_manipulation(train,test):
     #  Based on the category extracted before, the idea is to create a n clusters to
     #  aggregate set of similar categories
     # for esti in (2,3):#,60,70,80,90,100,110,125):
-    esti = 74
+    esti = 100
     km = MiniBatchKMeans(n_clusters=esti, random_state=888)#, init_size=esti*10)
     #       init='k-means++', n_clusters=3, n_init=10
     km.fit(cat_fea)
 
     # train['cat_clust_'+str(esti)] = km.predict(cat_fea)
     # test['cat_clust_'+str(esti)] = km.predict(cat_fea_test)
-    train['cat_clust_74'] = km.predict(cat_fea)
-    test['cat_clust_74'] = km.predict(cat_fea_test)
+    train['cat_clust_100'] = km.predict(cat_fea)
+    test['cat_clust_100'] = km.predict(cat_fea_test)
     # return train,test
 
 
@@ -81,14 +85,16 @@ def train_test():
 
     review_id = pred["review_id"]
 
-    del train["categories"], pred["categories"], train["review_id"], pred["review_id"]
+    del train["categories"], pred["categories"], train["review_id"], pred["review_id"], train["zip_code"], pred["zip_code"]
 
 
 
     target = np.array(train["votes_useful_rev"])
     target_var = ["votes_useful_rev"]
     binary_var = ["open"]
-    categorical_var = ["cat_clust_74", "zip_code"]
+    # categorical_var = ["cat_clust_100", "zip_code"]
+    categorical_var = ["cat_clust_100"]
+
     col_names_train= train.columns.values
     col_names_pred = pred.columns.values
     numerical_var = [col for col in col_names_train if col not in binary_var if col not in categorical_var if col not in target_var]
@@ -115,7 +121,7 @@ def train_test():
     #
     pd.DataFrame(train_x).to_csv("test_labelenc.csv")
 
-    train_x, pred_x = dummy_encoder(train_x, pred_x, categorical_variable_list=list(range(0,1)))
+    train_x, pred_x = dummy_encoder(train_x, pred_x, categorical_variable_list=list(range(0)))
     #
     #normalizing (if required)
     train_x_norm = normalize(train_x)
