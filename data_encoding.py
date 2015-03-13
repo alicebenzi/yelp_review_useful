@@ -9,6 +9,9 @@ from sklearn.cluster import MiniBatchKMeans
 
 
 def label_encoder(data, binary_cols):
+    """
+    Takes in binary variables and encodes the labels to numbers
+    """
     label_enc = LabelEncoder()
     for col in binary_cols:
         label_enc.fit(data[col])
@@ -18,6 +21,9 @@ def label_encoder(data, binary_cols):
 
 
 def dummy_encoder(train_X, test_X, categorical_variable_list):
+    """
+    Takes categorical variables and creates dummy columns corresponding to categorical variables
+    """
     enc = OneHotEncoder(n_values ='auto',categorical_features=categorical_variable_list)
     train_X = enc.fit_transform(train_X).toarray()
     test_X = enc.transform(test_X).toarray()
@@ -25,12 +31,18 @@ def dummy_encoder(train_X, test_X, categorical_variable_list):
 
 
 def normalize(X):
+    """
+    Normalize data
+    """
     normalizer = preprocessing.Normalizer().fit(X)
     normalized_X = normalizer.transform(X)
     return normalized_X
 
 
 def category_manipulation(train,test):
+    """
+    reducing categorical variables into clusters
+    """
     vect = CountVectorizer(tokenizer=lambda text: text.split(','))
 
     cat_fea = vect.fit_transform(train['categories'].fillna(''))
@@ -50,6 +62,9 @@ def category_manipulation(train,test):
 
 
 def train_test():
+    """
+    generating training and test data
+    """
     train = pd.read_csv('train_new.csv', header=0)
     pred = pd.read_csv('test_new.csv', header=0)
     category_manipulation(train, pred)
